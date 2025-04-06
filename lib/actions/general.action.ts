@@ -109,6 +109,20 @@ export async function getLatestInterviews(
   })) as Interview[];
 }
 
+export async function deleteInterviewByInterviewId(interviewId: string) {
+  const queryRef = db.collection("interviews")
+    .where("interviewId", "==", interviewId);
+
+  const snapshot = await queryRef.get();
+  
+  if (snapshot.empty) {
+    throw new Error("No interview found with ID: " + interviewId);
+  }
+
+  // Delete first matching document
+  await snapshot.docs[0].ref.delete();
+}
+
 export async function getInterviewsByUserId(
   userId: string
 ): Promise<Interview[] | null> {
