@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { vapi } from "@/lib/vapi.sdk";
 import { interviewer } from "@/constants";
 import { createFeedback } from "@/lib/actions/general.action";
+import { User } from "lucide-react";
 
 enum CallStatus {
   INACTIVE = "INACTIVE",
@@ -28,6 +29,7 @@ const Agent = ({
   feedbackId,
   type,
   questions,
+  isTemplate
 }: AgentProps) => {
   const router = useRouter();
   const [callStatus, setCallStatus] = useState<CallStatus>(CallStatus.INACTIVE);
@@ -98,21 +100,21 @@ const Agent = ({
       });
 
       if (success && id) {
-        router.push(`/interview/${interviewId}/feedback`);
+        router.push(`/dashboard/interview/${interviewId}/feedback?isTemplate=${isTemplate}`);
       } else {
         console.log("Error saving feedback");
-        router.push("/");
+        router.push("/dashboard");
       }
     };
 
     if (callStatus === CallStatus.FINISHED) {
       if (type === "generate") {
-        router.push("/");
+        router.push("/dashboard");
       } else {
         handleGenerateFeedback(messages);
       }
     }
-  }, [messages, callStatus, feedbackId, interviewId, router, type, userId]);
+  }, [messages, callStatus, feedbackId, interviewId, router, type, userId, isTemplate]);
 
   const handleCall = async () => {
     setCallStatus(CallStatus.CONNECTING);
@@ -150,9 +152,9 @@ const Agent = ({
       <div className="call-view">
         {/* AI Interviewer Card */}
         <div className="card-interviewer">
-          <div className="avatar">
+          <div >
             <Image
-              src="/ai-avatar.png"
+              src="/logo.png"
               alt="profile-image"
               width={65}
               height={54}
@@ -166,13 +168,7 @@ const Agent = ({
         {/* User Profile Card */}
         <div className="card-border">
           <div className="card-content">
-            <Image
-              src="/user-avatar.png"
-              alt="profile-image"
-              width={539}
-              height={539}
-              className="rounded-full object-cover size-[120px]"
-            />
+            <User size={125} />
             <h3>{userName}</h3>
           </div>
         </div>

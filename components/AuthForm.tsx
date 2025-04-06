@@ -2,7 +2,6 @@
 
 import { z } from "zod";
 import Link from "next/link";
-import Image from "next/image";
 import { toast } from "sonner";
 import { auth } from "@/firebase/client";
 import { useForm } from "react-hook-form";
@@ -19,6 +18,7 @@ import { Button } from "@/components/ui/button";
 
 import { signIn, signUp } from "@/lib/actions/auth.action";
 import FormField from "./FormField";
+import Image from "next/image";
 
 const authFormSchema = (type: FormType) => {
   return z.object({
@@ -86,8 +86,8 @@ const AuthForm = ({ type }: { type: FormType }) => {
           idToken,
         });
 
-        toast.success("Signed in successfully.");
-        router.push("/");
+        toast.success("Signed in successfully. Redirecting...");
+        router.replace("/dashboard");
       }
     } catch (error) {
       console.log(error);
@@ -98,14 +98,10 @@ const AuthForm = ({ type }: { type: FormType }) => {
   const isSignIn = type === "sign-in";
 
   return (
-    <div className="card-border lg:min-w-[566px]">
-      <div className="flex flex-col gap-6 card py-14 px-10">
-        <div className="flex flex-row gap-2 justify-center">
-          <Image src="/logo.svg" alt="logo" height={32} width={38} />
-          <h2 className="text-primary-100">PrepWise</h2>
-        </div>
-
-        <h3>Practice job interviews with AI</h3>
+    <div className="lg:min-w-[556px]">
+      <div className="flex flex-col gap-6 rounded-xl py-14 px-10">
+        <Image className="self-center md:hidden lg:hidden xl:hidden" src="/logo.png" height={16} width={16} alt="Mockero logo" />
+        <h3 className="">{isSignIn ? "Sign In Into Mockero" : "Join Mockero AI Today"}</h3>
 
         <Form {...form}>
           <form
