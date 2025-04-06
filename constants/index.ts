@@ -97,6 +97,13 @@ export const mappings = {
   "aws amplify": "amplify",
 };
 
+export const PRICING_PLAN_NAMES = {
+  FREE_PLAN : "free",
+  WEEKLY_PLAN: "weekly",
+  MONTHLY_PLAN: "monthly",
+  MAX_LIMIT: 3
+}
+
 export const interviewer: CreateAssistantDTO = {
   name: "Interviewer",
   firstMessage:
