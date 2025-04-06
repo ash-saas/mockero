@@ -7,7 +7,7 @@ const DisplayTechIcons = async ({ techStack }: TechIconProps) => {
 
   return (
     <div className="flex flex-row">
-      {techIcons.slice(0, 3).map(({ tech, url }, index) => (
+      {techIcons?.slice(0, 3).map(({ tech, url }, index) => (
         <div
           key={tech}
           className={cn(
@@ -26,6 +26,9 @@ const DisplayTechIcons = async ({ techStack }: TechIconProps) => {
           />
         </div>
       ))}
+      {
+        techIcons?.length > 3 && <p className="text-gray-400 text-xs self-center ml-1">+{techIcons?.length - 3}</p>
+      }
     </div>
   );
 };

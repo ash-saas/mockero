@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Mona_Sans } from "next/font/google";
 
 import "./globals.css";
+import Footer from "@/components/Footer";
 
 const monaSans = Mona_Sans({
   variable: "--font-mona-sans",
@@ -10,7 +11,7 @@ const monaSans = Mona_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "PrepWise",
+  title: "Mockero AI",
   description: "An AI-powered platform for preparing for mock interviews",
 };
 
@@ -23,7 +24,7 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body className={`${monaSans.className} antialiased pattern`}>
         {children}
-
+        <Footer />
         <Toaster />
       </body>
     </html>

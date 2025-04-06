@@ -142,7 +142,7 @@
     @apply bg-background text-foreground;
   }
   p {
-    @apply text-light-100;
+    @apply text-white;
   }
   h2 {
     @apply text-3xl font-semibold;
@@ -154,8 +154,13 @@
     @apply list-disc list-inside;
   }
   li {
-    @apply text-light-100;
+    @apply text-white;  
   }
+
+  * {
+    scroll-behavior: smooth;
+  }
+
 }
 
 @layer components {
@@ -197,15 +202,15 @@
     @apply w-full;
 
     .label {
-      @apply !text-light-100 !font-normal;
+      @apply !text-white !font-normal;
     }
 
     .input {
-      @apply !bg-dark-200 !rounded-full !min-h-12 !px-5 placeholder:!text-light-100;
+      @apply !bg-transparent border-4 border-white !rounded-lg !min-h-12 !px-5 placeholder:!text-white;
     }
 
     .btn {
-      @apply !w-full !bg-primary-200 !text-dark-100 hover:!bg-primary-200/80 !rounded-full !min-h-10 !font-bold !px-5 cursor-pointer;
+      @apply !w-full !bg-white !text-dark-100 hover:!bg-white !rounded-full !min-h-10 !font-bold !px-5 cursor-pointer;
     }
   }
 
@@ -213,7 +218,7 @@
     @apply flex sm:flex-row flex-col gap-10 items-center justify-between w-full;
 
     h3 {
-      @apply text-center text-primary-100 mt-5;
+      @apply text-center text-white mt-5;
     }
 
     .card-interviewer {
@@ -302,12 +307,12 @@
   @apply bg-gradient-to-b from-[#4B4D4F] to-[#4B4D4F33];
 }
 
-@utility pattern {
+/* @utility pattern {
   @apply bg-[url('/pattern.png')] bg-top bg-no-repeat;
-}
+} */
 
 @utility blue-gradient-dark {
-  @apply bg-gradient-to-b from-[#171532] to-[#08090D];
+  @apply bg-gradient-to-br from-[#692695] via-[#08050a] to-[#040302];
 }
 
 @utility blue-gradient {

@@ -45,6 +45,8 @@ interface InterviewCardProps {
   type: string;
   techstack: string[];
   createdAt?: string;
+  level: string,
+  isTemplate: boolean
 }
 
 interface AgentProps {
@@ -54,6 +56,7 @@ interface AgentProps {
   feedbackId?: string;
   type: "generate" | "interview";
   questions?: string[];
+  isTemplate: string;
 }
 
 interface RouteParams {

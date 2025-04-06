@@ -15,16 +15,19 @@ const InterviewCard = async ({
   type,
   techstack,
   createdAt,
+  level,
+  isTemplate
 }: InterviewCardProps) => {
   const feedback =
     userId && interviewId
       ? await getFeedbackByInterviewId({
-          interviewId,
-          userId,
-        })
+        interviewId,
+        userId,
+      })
       : null;
 
   const normalizedType = /mix/gi.test(type) ? "Mixed" : type;
+  const DASHBOARD_INTERVIEW_BASE_URL = "dashboard/interview";
 
   const badgeColor =
     {
@@ -81,6 +84,13 @@ const InterviewCard = async ({
             </div>
           </div>
 
+          {
+            level &&
+            <p className="border-2 mt-4 capitalize border-purple-400 text-xs px-4 py-2 font-semibold rounded-full text-left w-max">
+              {level}
+            </p>
+          }
+
           {/* Feedback or Placeholder Text */}
           <p className="line-clamp-2 mt-5">
             {feedback?.finalAssessment ||
@@ -91,15 +101,15 @@ const InterviewCard = async ({
         <div className="flex flex-row justify-between">
           <DisplayTechIcons techStack={techstack} />
 
-          <Button className="btn-primary">
+          <Button className="bg-white">
             <Link
               href={
                 feedback
-                  ? `/interview/${interviewId}/feedback`
-                  : `/interview/${interviewId}`
+                  ? `${DASHBOARD_INTERVIEW_BASE_URL}/${interviewId}/feedback?isTemplate=${isTemplate}`
+                  : `${DASHBOARD_INTERVIEW_BASE_URL}/${interviewId}?isTemplate=${isTemplate}`
               }
             >
-              {feedback ? "Check Feedback" : "View Interview"}
+              {feedback ? "Check Feedback" : "Take Interview"}
             </Link>
           </Button>
         </div>
