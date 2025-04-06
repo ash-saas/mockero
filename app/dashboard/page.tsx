@@ -4,21 +4,20 @@ import Image from "next/image";
 
 import { Button } from "@/components/ui/button";
 import InterviewCard from "@/components/InterviewCard";
-import { dummyInterviews } from "@/constants";
+import { dummyInterviews, PRICING_PLAN_NAMES } from "@/constants";
 
 import { getCurrentUser } from "@/lib/actions/auth.action";
 import {
   getInterviewsByUserId,
-  getLatestInterviews,
 } from "@/lib/actions/general.action";
-import { AudioLines } from "lucide-react";
+import { AudioLines, CreditCard } from "lucide-react";
+import ProgressBar from "@/components/Progress";
 
 async function Home() {
   const user = await getCurrentUser();
 
   const [userInterviews] = await Promise.all([
     getInterviewsByUserId(user?.id!),
-    getLatestInterviews({ userId: user?.id! }),
   ]);
 
   const hasPastInterviews = userInterviews?.length! > 0;
@@ -26,15 +25,36 @@ async function Home() {
   return (
     <>
       <section className="card-cta">
-        <div className="flex flex-col gap-6 max-w-lg">
+        <div className="flex flex-col gap-4 max-w-lg">
           <AudioLines size={34} />
-          <h2>Unlock Your Interview Potential with AI-Driven Practice & Insights</h2>
-          <p className="text-lg">
-            Master real interview questions and receive instant, actionable feedback to boost your confidence and skills.
-          </p>
-          <Button asChild className="bg-white w-48">
-            <Link href="dashboard/interview">Generate An Interview</Link>
-          </Button>
+          <h2 className="text-xl md:text-2xl">Unlock Your Interview Potential with AI-Driven Practice & Insights</h2>
+          <div>
+            <div className="flex flex-col md:flex-row md:items-center py-4">
+              <p>Currently on <span className="capitalize bg-gradient-to-r font-semibold from-purple-400 via-pink-500 to-red-500 bg-clip-text text-transparent">{user?.subscription.plan}</span> plan</p>
+              <Button variant={"outline"} disabled={((userInterviews?.length || 0) >= PRICING_PLAN_NAMES.MAX_LIMIT) && user?.subscription.plan === PRICING_PLAN_NAMES.FREE_PLAN} className="w-max py-4 md:ml-8 mt-2 md:mt-0">
+                <CreditCard color="white" />
+                <Link className="text-white" href="/billing">Manage Billing</Link>
+              </Button>
+            </div>
+            {
+              user?.subscription.plan !== PRICING_PLAN_NAMES.FREE_PLAN &&
+              <p className="text-sm md:text-md text-[#A2A2A2] mt-1">You Can Generate Unlimited Interviews</p>
+            }
+          </div>
+
+          {
+            user?.subscription.plan === PRICING_PLAN_NAMES.FREE_PLAN &&
+            <div>
+              <ProgressBar completed={userInterviews?.length || 0} total={3} />
+              <p className="text-sm md:text-md text-[#A2A2A2] mt-2">Upgrade To Generate Unlimited Interviews</p>
+            </div>
+          }
+
+          <div className="flex flex-col md:flex-row justify-center md:justify-start md:items-center  mt-4">
+            <Button disabled={userInterviews?.length === PRICING_PLAN_NAMES.MAX_LIMIT} className="bg-white w-max">
+              <Link href="dashboard/interview">Generate An Interview</Link>
+            </Button>
+          </div>
         </div>
 
         <Image

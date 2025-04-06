@@ -34,7 +34,7 @@ function Pricing() {
 
             <div className="rounded-2xl p-4 border-2 border-gray-200 shadow-xs sm:order-last sm:px-8 lg:p-8">
                 <h2 className="text-lg font-bold text-white">Mockero AI Pro</h2>
-                <h1 className="text-xl md:text-2xl mt-4 font-bold text-white">$7.49 <span className="text-white/50 text-sm font-normal">/ week</span></h1>
+                <h1 className="text-xl md:text-2xl mt-4 font-bold text-white">$6.49 <span className="text-white/50 text-sm font-normal">/ week</span></h1>
                 <p className="text-white mt-2">Perfect for last minute interview preprations</p>
 
                 <ul>
@@ -65,7 +65,7 @@ function Pricing() {
 
             <div className="rounded-2xl border-2 border-purple-400 p-4 shadow-xs sm:order-last sm:px-8 lg:p-8">
                 <h2 className="text-lg font-bold text-white">Mockero AI Pro</h2>
-                <h1 className="text-xl md:text-2xl mt-4 font-bold text-white">$14.99 <span className="text-white/50 text-sm font-normal">/ month</span> <span className="text-emerald-500 text-sm font-normal">Better value</span></h1>
+                <h1 className="text-xl md:text-2xl mt-4 font-bold text-white">$11.99 <span className="text-white/50 text-sm font-normal">/ month</span> <span className="text-emerald-500 text-sm font-normal">Better value</span></h1>
                 <p className="text-white mt-2">Perfect for road to glory (that dream job!)</p>
 
                 <ul>

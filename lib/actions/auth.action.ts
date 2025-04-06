@@ -41,8 +41,16 @@ export async function signUp(params: SignUpParams) {
     await db.collection("users").doc(uid).set({
       name,
       email,
-      // profileURL,
-      // resumeURL,
+      stripeCustomerId: null, // Not created yet; will be set when the user upgrades to a paid plan
+      subscription: {
+        plan: "free",                 // Default free plan
+        stripeSubscriptionId: null,   // Will be populated for paid plans
+        status: "active",             // Indicates active free subscription
+        currentPeriodStart: null,     // Subscription period start
+        currentPeriodEnd: null,       // Subscription period end
+      },
+      createdAt: new Date(),          // Alternatively, use Firebase server timestamps if available
+      updatedAt: new Date(),
     });
 
     return {
