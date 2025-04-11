@@ -5,6 +5,7 @@ import { google } from "@ai-sdk/google";
 
 import { db } from "@/firebase/admin";
 import { feedbackSchema } from "@/constants";
+import { Timestamp } from "firebase-admin/firestore";
 
 export async function createFeedback(params: CreateFeedbackParams) {
   const { interviewId, userId, transcript, feedbackId } = params;
@@ -114,7 +115,7 @@ export async function deleteInterviewByInterviewId(interviewId: string) {
     .where("interviewId", "==", interviewId);
 
   const snapshot = await queryRef.get();
-  
+
   if (snapshot.empty) {
     throw new Error("No interview found with ID: " + interviewId);
   }

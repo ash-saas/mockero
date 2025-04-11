@@ -74,11 +74,11 @@ const InterviewDetails = async ({ params, searchParams }: RouteParams) => {
           </AccordionContent>
           <AccordionContent>
             <h4 className="text-xl font-semibold">Topics</h4>
-            <div className="flex items-center flex-row mt-4">
+            <div className="flex items-center flex-row flex-wrap">
               {
                 interview.techstack.map((skill: string, index: number) => {
                   return (
-                    <div key={index}>
+                    <div key={index} className="mt-2">
                       <p className="mr-2 bg-dark-200 px-4 py-2 rounded-lg h-fit capitalize w-max">
                         {skill}
                       </p>
