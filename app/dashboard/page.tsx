@@ -11,13 +11,15 @@ import {
   getInterviewsByUserId,
 } from "@/lib/actions/general.action";
 import { AudioLines, CreditCard } from "lucide-react";
-import ProgressBar from "@/components/Progress";
+import { convertFirebaseTimestampToJSDate, isTrialExpired } from "@/lib/utils";
 
 async function Home() {
-  const user = await getCurrentUser();
+  const user = await getCurrentUser() as User;
 
-  const [userInterviews] = await Promise.all([
+  const [userInterviews, trialExpired, trialExpirationDate] = await Promise.all([
     getInterviewsByUserId(user?.id!),
+    isTrialExpired(),
+    convertFirebaseTimestampToJSDate(user?.subscription?.trialExpiration)
   ]);
 
   const hasPastInterviews = userInterviews?.length! > 0;
@@ -31,27 +33,31 @@ async function Home() {
           <div>
             <div className="flex flex-col md:flex-row md:items-center py-4">
               <p>Currently on <span className="capitalize bg-gradient-to-r font-semibold from-purple-400 via-pink-500 to-red-500 bg-clip-text text-transparent">{user?.subscription.plan}</span> plan</p>
-              <Button variant={"outline"} disabled={((userInterviews?.length || 0) >= PRICING_PLAN_NAMES.MAX_LIMIT) && user?.subscription.plan === PRICING_PLAN_NAMES.FREE_PLAN} className="w-max py-4 md:ml-8 mt-2 md:mt-0">
+              <Button variant={"outline"} className="w-max py-4 md:ml-8 mt-2 md:mt-0">
                 <CreditCard color="white" />
                 <Link className="text-white" href="/billing">Manage Billing</Link>
               </Button>
             </div>
             {
-              user?.subscription.plan !== PRICING_PLAN_NAMES.FREE_PLAN &&
-              <p className="text-sm md:text-md text-[#A2A2A2] mt-1">You Can Generate Unlimited Interviews</p>
+              user?.subscription.plan !== PRICING_PLAN_NAMES.TRIAL &&
+              <p className="text-sm md:text-md text-[#A2A2A2] mt-1">Let's ace that interview 💪🏻</p>
             }
           </div>
 
           {
-            user?.subscription.plan === PRICING_PLAN_NAMES.FREE_PLAN &&
-            <div>
-              <ProgressBar completed={userInterviews?.length || 0} total={3} />
-              <p className="text-sm md:text-md text-[#A2A2A2] mt-2">Upgrade To Generate Unlimited Interviews</p>
-            </div>
+            (user?.subscription.plan === PRICING_PLAN_NAMES.TRIAL && !trialExpired) ?
+              <div>
+                <p className="text-sm md:text-md text-[#A2A2A2]">Liking it so far? Upgrade to continue using Mockero after the trial expires.</p>
+                <p className="text-sm md:text-md text-[#A2A2A2]">Your trial expires on {trialExpirationDate?.toLocaleDateString()}</p>
+              </div>
+              :
+              <div>
+                <p className="text-sm md:text-md text-amber-400">Your trial has expired. Choose a plan to continue using Mockero.</p>
+              </div>
           }
 
           <div className="flex flex-col md:flex-row justify-center md:justify-start md:items-center  mt-4">
-            <Button disabled={userInterviews?.length === PRICING_PLAN_NAMES.MAX_LIMIT} className="bg-white w-max">
+            <Button disabled={trialExpired} className="bg-white w-max">
               <Link href="dashboard/interview">Generate An Interview</Link>
             </Button>
           </div>
@@ -86,6 +92,7 @@ async function Home() {
                 createdAt={interview.createdAt}
                 level={interview.level}
                 isTemplate={false}
+                isTrialExpired={trialExpired}
               />
             ))
           ) : (
@@ -113,6 +120,7 @@ async function Home() {
                 techstack={interview.techstack}
                 createdAt={interview.createdAt}
                 isTemplate={true}
+                isTrialExpired={trialExpired}
               />
             ))
           ) : (

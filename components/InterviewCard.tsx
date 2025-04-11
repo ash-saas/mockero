@@ -16,7 +16,8 @@ const InterviewCard = async ({
   techstack,
   createdAt,
   level,
-  isTemplate
+  isTemplate,
+  isTrialExpired
 }: InterviewCardProps) => {
   const feedback =
     userId && interviewId
@@ -112,7 +113,7 @@ const InterviewCard = async ({
         <div className="flex flex-row justify-between">
           <DisplayTechIcons techStack={techstack} />
 
-          <Button className="bg-white">
+          <Button disabled={isTrialExpired} className="bg-white">
             <Link
               href={
                 feedback

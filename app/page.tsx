@@ -91,7 +91,7 @@ const Page = () => {
                         Simple Pricing. No hidden charges.
                     </p>
                     <div className='h-full m-auto flex item-center justify-center flex-col'>
-                        <Pricing />
+                        <Pricing isPricingPage={false} />
                     </div>
                 </AnimationContainer>
             </div>

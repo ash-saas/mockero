@@ -1,6 +1,10 @@
 import { interviewCovers, mappings } from "@/constants";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { getCurrentUser, updateTrialStatus } from "./actions/auth.action";
+import { Timestamp } from "firebase/firestore";
+import { date } from "zod";
+
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -45,3 +49,41 @@ export const getRandomInterviewCover = () => {
   const randomIndex = Math.floor(Math.random() * interviewCovers.length);
   return `/covers${interviewCovers[randomIndex]}`;
 };
+
+export const isTrialExpired = async () => {
+
+  const user: User = await getCurrentUser();
+  const trialTime = user.subscription?.trialExpiration;
+  const isTrialExpired = user.subscription.isTrialExpired;
+
+  const trialTimeDate = await (convertFirebaseTimestampToJSDate(trialTime))
+  const currentDate = new Date()
+
+  const isAfter = currentDate > trialTimeDate!;
+
+  if (isAfter || isTrialExpired) {
+    await updateTrialStatus()
+    return true;
+  }
+  return false;
+
+}
+
+/**
+ * Converts a Firebase Timestamp or a JavaScript Date (or undefined) to a JavaScript Date.
+ *
+ * @param date - A Firebase Timestamp, a Date, or undefined.
+ * @returns A Promise that resolves to a JavaScript Date, or undefined if no valid date is provided.
+ */
+export async function convertFirebaseTimestampToJSDate(date?: Timestamp | Date): Promise<Date | undefined> {
+  // Return undefined if the input is undefined or null.
+  if (!date) return undefined;
+
+  // If it's already a JavaScript Date, return it.
+  if (date instanceof Date) {
+    return date;
+  }
+
+  // For Firebase Timestamps, use the toDate() method to convert.
+  return new Date(date.toDate());
+}

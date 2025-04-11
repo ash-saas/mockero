@@ -1,6 +1,8 @@
 "use server";
 
 import { auth, db } from "@/firebase/admin";
+import { SignInParams, SignUpParams, User } from "@/types";
+import { Timestamp } from "firebase/firestore";
 import { cookies } from "next/headers";
 
 // Session duration (1 week)
@@ -41,13 +43,15 @@ export async function signUp(params: SignUpParams) {
     await db.collection("users").doc(uid).set({
       name,
       email,
-      stripeCustomerId: null, // Not created yet; will be set when the user upgrades to a paid plan
+      paddleSubscriptionId: null, // Not created yet; will be set when the user upgrades to a paid plan
       subscription: {
-        plan: "free",                 // Default free plan
-        stripeSubscriptionId: null,   // Will be populated for paid plans
+        plan: "trial",                 // Default trial plan
+        paddleSubscriptionId: null,   // Will be populated for paid plans
         status: "active",             // Indicates active free subscription
         currentPeriodStart: null,     // Subscription period start
         currentPeriodEnd: null,       // Subscription period end
+        isTrialExpired: false,
+        trialExpiration: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)  //To be expired after 3 days automatically
       },
       createdAt: new Date(),          // Alternatively, use Firebase server timestamps if available
       updatedAt: new Date(),
@@ -130,6 +134,45 @@ export async function getCurrentUser(): Promise<User | null> {
 
     // Invalid or expired session
     return null;
+  }
+}
+
+export async function updateTrialStatus(): Promise<boolean> {
+  const cookieStore = await cookies();
+
+  const sessionCookie = cookieStore.get("session")?.value;
+  if (!sessionCookie) return false;
+
+  try {
+    const decodedClaims = await auth.verifySessionCookie(sessionCookie, true);
+    const userId = decodedClaims.uid;
+
+    // Get user from database
+    const userDoc = await db.collection("users").doc(userId).get();
+    if (!userDoc.exists) return false;
+
+    const userData = userDoc.data() as User;
+    const trialTime = userData.subscription?.trialExpiration as Timestamp;
+
+    // If no trial expiration date is set, nothing to update
+    if (!trialTime) return false;
+
+    const trialTimeDate = new Date(trialTime.toDate());
+    const currentDate = new Date();
+    const isExpired = currentDate > trialTimeDate;
+
+    // Only update if trial has expired but flag hasn't been set yet
+    if (isExpired && !userData.subscription?.isTrialExpired) {
+      await db.collection("users").doc(userId).update({
+        "subscription.isTrialExpired": true
+      });
+      return true; // Updated successfully
+    }
+
+    return false; // No update needed
+  } catch (error) {
+    console.error("Error updating trial status:", error);
+    return false;
   }
 }
 
