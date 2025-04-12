@@ -13,6 +13,17 @@ const monaSans = Mona_Sans({
 export const metadata: Metadata = {
   title: "Mockero AI",
   description: "An AI-powered platform for preparing for mock interviews",
+  keywords: [
+    "ai interview",
+    "ai interviewer",
+    "interview with ai",
+    "mock interview",
+    "mockup interviews",
+    "practice interview",
+    "interview",
+    "interview questions",
+    "interview questions for practice"
+  ]
 };
 
 export default function RootLayout({
