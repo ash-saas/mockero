@@ -99,9 +99,14 @@ export const mappings = {
 
 export const PRICING_PLAN_NAMES = {
   TRIAL: "trial",
-  WEEKLY_PLAN: "weekly",
-  MONTHLY_PLAN: "monthly",
-  MAX_LIMIT: 3
+  WEEKLY_PLAN: "week",
+  MONTHLY_PLAN: "month"
+}
+
+export const SUBSCRIPTION_STATUS_NAMES = {
+  ACTIVE: "active",
+  PAST_DUE: "past_due",
+  CANCELLED: "canceled"
 }
 
 export const interviewer: CreateAssistantDTO = {

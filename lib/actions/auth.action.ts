@@ -43,7 +43,7 @@ export async function signUp(params: SignUpParams) {
     await db.collection("users").doc(uid).set({
       name,
       email,
-      paddleSubscriptionId: null, // Not created yet; will be set when the user upgrades to a paid plan
+      paddleCustomerId: null, // Not created yet; will be set when the user upgrades to a paid plan
       subscription: {
         plan: "trial",                 // Default trial plan
         paddleSubscriptionId: null,   // Will be populated for paid plans
@@ -173,6 +173,45 @@ export async function updateTrialStatus(): Promise<boolean> {
   } catch (error) {
     console.error("Error updating trial status:", error);
     return false;
+  }
+}
+
+export async function updateUserSubscription(params: UpdateUserInfo) {
+
+  try {
+
+    const userId = params.userId;
+
+    // Get user from database
+    const userDoc = await db.collection("users").doc(userId).get();
+    if (!userDoc.exists) return;
+
+    let isCancellationQueued = false;
+
+    console.log("Event type: ", params.eventType);
+
+    if (params.eventType === "subscription.updated") {
+      isCancellationQueued = true;
+    }
+
+    if (params.eventType === "subscription.canceled") {
+      isCancellationQueued = false;
+    }
+
+    await db.collection("users").doc(userId).update({
+      "paddleCustomerId": params.paddleCustomerId,
+      "subscription.plan": params.planName,
+      "subscription.currentPeriodStart": params.currentPeriodStart,
+      "subscription.currentPeriodEnd": params.currentPeriodEnd,
+      "subscription.status": params.status,
+      "subscription.paddleSubscriptionId": params.paddleSubscriptionId,
+      "subscription.isCancellationQueued": isCancellationQueued
+    });
+
+    console.log("User Updated OK!");
+
+  } catch (error) {
+    console.error("Error updating trial status:", error);
   }
 }
 

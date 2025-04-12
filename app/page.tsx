@@ -88,7 +88,7 @@ const Page = () => {
                 <AnimationContainer delay={0.2} className="relative md:pt-16 pt-16 pb-20 md:py-8 bg-transparent w-full">
                     <SparkleButton text='Pricing' />
                     <p id='pricing' className="text-md py-6 mt-2 text-center text-white">
-                        Simple Pricing. No hidden charges.
+                        Start with a 3-day trial. Flexible pricing plans. No hidden charges.
                     </p>
                     <div className='h-full m-auto flex item-center justify-center flex-col'>
                         <Pricing isPricingPage={false} />

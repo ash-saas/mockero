@@ -50,19 +50,29 @@ interface Subscription {
   currentPeriodEnd?: Date | null;            // End of the current billing period
   isTrialExpired?: boolean;
   trialExpiration?: Date;
+  isCancellationQueued: boolean;
 }
 
 interface User {
   name: string;
   email: string;
   id: string;
-  subscription: Subscription;                // Embedded subscription details
+  subscription: Subscription;
+  paddleCustomerId: string;
   createdAt: Date;
   updatedAt: Date;
 }
 
-
-
+interface UpdateUserInfo {
+  paddleCustomerId: string;
+  paddleSubscriptionId: string;
+  currentPeriodStart: Date;
+  currentPeriodEnd: Date;
+  planName: string;
+  status: string;
+  userId: string;
+  eventType: string;
+}
 
 interface InterviewCardProps {
   interviewId?: string;

@@ -5,7 +5,7 @@ import { Environments, initializePaddle, Paddle } from "@paddle/paddle-js"
 import { toast } from "sonner";
 import { Button } from '../ui/button';
 
-const MonthlyPayment = () => {
+const MonthlyPayment = ({ userId }: { userId: string }) => {
 
     const [paddle, setPaddle] = useState<Paddle>()
 
@@ -26,6 +26,9 @@ const MonthlyPayment = () => {
         }
 
         paddle.Checkout.open({
+            customData: {
+                userId: userId
+            },
             items: [
                 {
                     priceId: process.env.NEXT_PUBLIC_PADDLE_MONTHLY_PRODUCT_ID!,
@@ -36,8 +39,8 @@ const MonthlyPayment = () => {
                 displayMode: "overlay",
                 theme: "dark",
                 successUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/billing/success`,
-                allowLogout: false
-            }
+                allowLogout: false,
+            },
         })
     }
 
