@@ -1,6 +1,5 @@
+import CancellationDrawer from '@/components/payments/CancellationDrawer'
 import Pricing from '@/components/Pricing'
-import { Button } from '@/components/ui/button'
-import { DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerFooter, DrawerClose, Drawer } from '@/components/ui/drawer'
 import { PRICING_PLAN_NAMES } from '@/constants'
 import { getCurrentUser } from '@/lib/actions/auth.action'
 import { convertFirebaseTimestampToJSDate } from '@/lib/utils'
@@ -10,8 +9,9 @@ import React from 'react'
 const Billing = async () => {
 
     const user = await getCurrentUser() as User;
-    const [trialExpirationDate] = await Promise.all([
-        convertFirebaseTimestampToJSDate(user?.subscription?.trialExpiration)
+    const [trialExpirationDate, accessAvailableUntilDate] = await Promise.all([
+        convertFirebaseTimestampToJSDate(user?.subscription?.trialExpiration),
+        convertFirebaseTimestampToJSDate(user?.subscription?.currentPeriodEnd ?? undefined)
     ]);
 
     return (
@@ -24,28 +24,31 @@ const Billing = async () => {
             <div className='mt-4'>
                 {
                     user?.subscription?.plan === PRICING_PLAN_NAMES.TRIAL ?
-                        <p>You are currently on <span className='capitalize'>{user.subscription.plan}</span> plan. Your trial expires on {trialExpirationDate?.toLocaleDateString()}</p>
+                        <p>You are currently on <span className='capitalize  bg-gradient-to-r font-semibold from-purple-400 via-pink-500 to-red-500 bg-clip-text text-transparent'>{user.subscription.plan}</span> plan. Your trial expires on {trialExpirationDate?.toLocaleDateString()}
+                        </p>
                         :
-                        <div className='flex md:items-center items-start md:flex-row flex-col'>
-                            <p>You are currently on <span className='capitalize'>{user.subscription.plan}</span> plan. Your card will be automatically charged on {trialExpirationDate?.toLocaleDateString()} </p>
-                            <Drawer>
-                                <DrawerTrigger className='mt-4 md:mt-0 md:ml-4' asChild>
-                                    <Button className='text-red-500 cursor-pointer' variant={"ghost"}>Cancel Plan</Button>
-                                </DrawerTrigger>
-                                <DrawerContent>
-                                    <DrawerHeader>
-                                        <DrawerTitle>Cancel Plan?</DrawerTitle>
-                                        <DrawerDescription>You can continue using Mockero until <span>{user?.subscription?.currentPeriodEnd?.toDateString()}</span></DrawerDescription>
-                                    </DrawerHeader>
-                                    <DrawerFooter>
-                                        <Button className='cursor-pointer' variant={"destructive"}>Yes, cancel my plan</Button>
-                                        <DrawerClose asChild className='w-full'>
-                                            <Button
-                                                className='cursor-pointer' variant="default">Go back</Button>
-                                        </DrawerClose>
-                                    </DrawerFooter>
-                                </DrawerContent>
-                            </Drawer>
+                        <div className='flex items-start flex-col'>
+                            {
+                                user?.subscription?.isCancellationQueued ? (
+                                    <p className='text-amber-400'>Your plan was cancelled by you. You can continue using Mockero until {accessAvailableUntilDate?.toLocaleDateString()}
+                                    </p>
+                                ) : (
+                                    <>
+                                        <p>
+                                            You’re currently subscribed to the{' '}
+                                            <span className='capitalize bg-gradient-to-r font-semibold from-purple-400 via-pink-500 to-red-500 bg-clip-text text-transparent'>
+                                                {user.subscription.plan}
+                                            </span>{' '}
+                                            plan. Your card will be automatically charged on{' '}
+                                            <span className='font-semibold'>
+                                                {accessAvailableUntilDate?.toLocaleDateString()}
+                                            </span>{' '}
+                                            unless you choose to cancel.
+                                        </p>
+                                        <CancellationDrawer subscriptionId={user?.subscription?.paddleSubscriptionId || ""} accessAvailableUntilDate={accessAvailableUntilDate?.toLocaleDateString()} />
+                                    </>
+                                )
+                            }
                         </div>
                 }
 

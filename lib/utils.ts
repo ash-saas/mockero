@@ -1,9 +1,8 @@
-import { interviewCovers, mappings } from "@/constants";
+import { interviewCovers, mappings, SUBSCRIPTION_STATUS_NAMES } from "@/constants";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { getCurrentUser, updateTrialStatus } from "./actions/auth.action";
 import { Timestamp } from "firebase/firestore";
-import { date } from "zod";
 
 
 export function cn(...inputs: ClassValue[]) {
@@ -68,6 +67,25 @@ export const isTrialExpired = async () => {
   return false;
 
 }
+
+export const isAccessRevoked = async () => {
+
+  const user: User = await getCurrentUser();
+  const endPeriod = user?.subscription?.currentPeriodEnd;
+
+  const accessEndTimeDate = await (convertFirebaseTimestampToJSDate(endPeriod!))
+  const currentDate = new Date()
+  const status = user?.subscription?.status;
+
+  const isAfter = currentDate > accessEndTimeDate!;
+
+  if (isAfter && (status === SUBSCRIPTION_STATUS_NAMES.CANCELLED)) {
+    return true;
+  }
+  return false;
+
+}
+
 
 /**
  * Converts a Firebase Timestamp or a JavaScript Date (or undefined) to a JavaScript Date.

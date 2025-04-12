@@ -4,25 +4,39 @@ import Image from "next/image";
 
 import { Button } from "@/components/ui/button";
 import InterviewCard from "@/components/InterviewCard";
-import { dummyInterviews, PRICING_PLAN_NAMES } from "@/constants";
+import { dummyInterviews, PRICING_PLAN_NAMES, SUBSCRIPTION_STATUS_NAMES } from "@/constants";
 
 import { getCurrentUser } from "@/lib/actions/auth.action";
 import {
   getInterviewsByUserId,
 } from "@/lib/actions/general.action";
-import { AudioLines, CreditCard } from "lucide-react";
-import { convertFirebaseTimestampToJSDate, isTrialExpired } from "@/lib/utils";
+import { AudioLines, CreditCard, MicOff } from "lucide-react";
+import { convertFirebaseTimestampToJSDate, isTrialExpired, isAccessRevoked } from "@/lib/utils";
 
 async function Home() {
   const user = await getCurrentUser() as User;
 
-  const [userInterviews, trialExpired, trialExpirationDate] = await Promise.all([
+  const [userInterviews, trialExpired, trialExpirationDate, accessRevoked, accessUntil] = await Promise.all([
     getInterviewsByUserId(user?.id!),
     isTrialExpired(),
-    convertFirebaseTimestampToJSDate(user?.subscription?.trialExpiration)
+    convertFirebaseTimestampToJSDate(user?.subscription?.trialExpiration),
+    isAccessRevoked(),
+    convertFirebaseTimestampToJSDate(user?.subscription?.currentPeriodEnd!),
   ]);
 
+  const evaluateAccess = () => {
+
+    let accessDenied = true;
+    if (!trialExpired || !accessRevoked) {
+      accessDenied = false;
+    }
+
+    return accessDenied;
+
+  }
+
   const hasPastInterviews = userInterviews?.length! > 0;
+  const doesUserHaveAccess = evaluateAccess();
 
   return (
     <>
@@ -40,7 +54,22 @@ async function Home() {
             </div>
             {
               user?.subscription.plan !== PRICING_PLAN_NAMES.TRIAL &&
-              <p className="text-sm md:text-md text-[#A2A2A2] mt-1">Let's ace that interview 💪🏻</p>
+              <div>
+                {
+                  user?.subscription?.status === SUBSCRIPTION_STATUS_NAMES.ACTIVE ? (
+                    <p className="text-sm md:text-md text-[#A2A2A2] mt-1">Let's ace that interview 💪🏻</p>
+                  ) : user?.subscription?.status === SUBSCRIPTION_STATUS_NAMES.PAST_DUE ? (
+                    <p className="text-sm md:text-md text-red-500 mt-1">
+                      Your payment is pending. Complete your payment to continue using Mockero.
+                    </p>
+                  ) : user?.subscription?.status === SUBSCRIPTION_STATUS_NAMES.CANCELLED ? (
+                    <p className="text-sm md:text-md text-amber-400 mt-1">
+                      Your plan was cancelled. You can continue using Mockero until{' '}
+                      {accessUntil?.toLocaleDateString()}
+                    </p>
+                  ) : null
+                }
+              </div>
             }
           </div>
 
@@ -52,12 +81,18 @@ async function Home() {
               </div>
               :
               <div>
-                <p className="text-sm md:text-md text-amber-400">Your trial has expired. Choose a plan to continue using Mockero.</p>
+                {
+                  user?.subscription.plan === PRICING_PLAN_NAMES.TRIAL && <p className="text-sm md:text-md text-amber-400">Your trial has expired. Choose a plan to continue using Mockero.</p>
+                }
               </div>
           }
 
-          <div className="flex flex-col md:flex-row justify-center md:justify-start md:items-center  mt-4">
-            <Button disabled={trialExpired} className="bg-white w-max">
+          {
+
+          }
+
+          <div className="flex flex-col md:flex-row justify-center md:justify-start md:items-center">
+            <Button disabled={doesUserHaveAccess} className="bg-white w-max">
               <Link href="dashboard/interview">Generate An Interview</Link>
             </Button>
           </div>
@@ -92,11 +127,14 @@ async function Home() {
                 createdAt={interview.createdAt}
                 level={interview.level}
                 isTemplate={false}
-                isTrialExpired={trialExpired}
+                isTrialExpired={doesUserHaveAccess}
               />
             ))
           ) : (
-            <p>You haven&apos;t taken any interviews yet</p>
+            <div className="flex w-full item-center flex-col text-center my-8">
+              <MicOff size={42} className="self-center" />
+              <p className="mt-2">You haven&apos;t taken any interviews yet</p>
+            </div>
           )}
         </div>
       </section>
@@ -120,7 +158,7 @@ async function Home() {
                 techstack={interview.techstack}
                 createdAt={interview.createdAt}
                 isTemplate={true}
-                isTrialExpired={trialExpired}
+                isTrialExpired={doesUserHaveAccess}
               />
             ))
           ) : (

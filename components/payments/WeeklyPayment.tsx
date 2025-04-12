@@ -5,7 +5,7 @@ import { Environments, initializePaddle, Paddle } from "@paddle/paddle-js"
 import { toast } from "sonner";
 import { Button } from '../ui/button';
 
-const WeeklyPayment = () => {
+const WeeklyPayment = ({ userId }: { userId: string }) => {
 
     const [paddle, setPaddle] = useState<Paddle>()
 
@@ -26,6 +26,9 @@ const WeeklyPayment = () => {
         }
 
         paddle.Checkout.open({
+            customData: {
+                userId: userId
+            },
             items: [
                 {
                     priceId: process.env.NEXT_PUBLIC_PADDLE_WEEKLY_PRODUCT_ID!,

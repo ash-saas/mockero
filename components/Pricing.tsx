@@ -2,7 +2,13 @@ import { CheckCircle, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import WeeklyPayment from "./payments/WeeklyPayment";
 import MonthlyPayment from "./payments/MonthlyPayment";
-function Pricing({ isPricingPage }: { isPricingPage: boolean }) {
+import { getCurrentUser } from "@/lib/actions/auth.action";
+import { SUBSCRIPTION_STATUS_NAMES } from "@/constants";
+
+async function Pricing({ isPricingPage }: { isPricingPage: boolean }) {
+
+    const user = await getCurrentUser() as User;;
+
     return (
         <div className="flex w-full mx-auto flex-col justify-around my-8 md:flex-row lg:flex-row gap-4 ">
 
@@ -39,14 +45,17 @@ function Pricing({ isPricingPage }: { isPricingPage: boolean }) {
                         </a>
                         :
                         <div className="mt-8">
-                            <WeeklyPayment />
+                            {
+                                (user?.subscription.status === SUBSCRIPTION_STATUS_NAMES.ACTIVE || user?.subscription.status === SUBSCRIPTION_STATUS_NAMES.PAST_DUE) && user?.subscription?.isCancellationQueued === false ? <Button disabled={true}>Cancel exisitng plan to continue</Button> :
+                                    <WeeklyPayment userId={user?.id} />
+                            }
                         </div>
                 }
             </div>
 
             <div className="rounded-2xl border-2 border-purple-400 p-4 shadow-xs sm:order-last sm:px-8 lg:p-8">
                 <h2 className="text-lg font-bold text-white">Mockero AI Pro</h2>
-                <h1 className="text-xl md:text-2xl mt-4 font-bold text-white">$11.99 <span className="text-white/80 text-sm font-normal">/ month</span> <span className="text-emerald-500 text-sm font-normal">Better value</span></h1>
+                <h1 className="text-xl md:text-2xl mt-4 font-bold text-white">$11.99 <span className="text-white/80 text-sm font-normal">/ month</span> <span className="text-[#45ea69] text-sm font-normal">Better value</span></h1>
                 <p className="text-white mt-2">Perfect for road to glory (that dream job)!</p>
 
                 <ul>
@@ -71,7 +80,10 @@ function Pricing({ isPricingPage }: { isPricingPage: boolean }) {
                 {
                     isPricingPage ?
                         <div className="mt-8">
-                            <MonthlyPayment />
+                            {
+                                (user?.subscription.status === SUBSCRIPTION_STATUS_NAMES.ACTIVE || user?.subscription.status === SUBSCRIPTION_STATUS_NAMES.PAST_DUE) && user?.subscription.isCancellationQueued === false ? <Button disabled={true}>Cancel exisitng plan to continue</Button> :
+                                    <MonthlyPayment userId={user?.id} />
+                            }
                         </div>
                         :
                         <a href="/sign-in">
